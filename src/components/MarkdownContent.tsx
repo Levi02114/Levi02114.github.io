@@ -5,7 +5,7 @@ interface MarkdownContentProps {
 export default function MarkdownContent({ html }: MarkdownContentProps) {
   return (
     <div
-      className="markdown-content"
+      className="markdown-content min-w-0"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

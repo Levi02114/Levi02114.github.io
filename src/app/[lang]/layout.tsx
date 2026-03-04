@@ -17,7 +17,7 @@ export async function generateMetadata({
   const { lang } = await params;
 
   return {
-    title: "Levi02114's Blog",
+    title: "Levi02114 Notes",
     description: lang === 'ko'
       ? "한국어와 영어로 작성된 개인 블로그"
       : "Personal blog with Korean and English posts",

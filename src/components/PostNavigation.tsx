@@ -77,8 +77,8 @@ export default function PostNavigation({
     <nav
       aria-label="Blog post navigation"
       className={`
-        sticky top-0 z-40 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl
-        border-b border-stone-200 dark:border-stone-800
+        sticky top-0 z-40 bg-[rgba(255,250,242,0.88)] backdrop-blur-xl
+        border-b border-[color:var(--color-border)]
         ${className}
       `}
     >
@@ -90,12 +90,12 @@ export default function PostNavigation({
               <Link
                 href={`/${lang}/posts/${post.slug}`}
                 className={`
-                  hover:text-blue-600 dark:hover:text-blue-400 transition-colors
+                  hover:text-amber-700 transition-colors
                   truncate max-w-[200px]
                   ${
                     currentSlug === post.slug
-                      ? 'font-semibold text-blue-600 dark:text-blue-400'
-                      : 'text-stone-600 dark:text-stone-400'
+                      ? 'font-semibold text-amber-700'
+                      : 'text-stone-600'
                   }
                 `}
                 title={post.frontmatter.title}
@@ -103,7 +103,7 @@ export default function PostNavigation({
                 {post.frontmatter.title}
               </Link>
               {index < displayedPosts.length - 1 && (
-                <span className="mx-2 text-stone-300 dark:text-stone-700">|</span>
+                <span className="mx-2 text-stone-300">|</span>
               )}
             </div>
           ))}
@@ -121,8 +121,8 @@ export default function PostNavigation({
                 px-3 py-1 rounded-lg text-sm
                 ${
                   currentPage === 1
-                    ? 'text-stone-300 dark:text-stone-700 cursor-not-allowed'
-                    : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+                    ? 'text-stone-300 cursor-not-allowed'
+                    : 'text-stone-600 hover:bg-[var(--color-accent-subtle)]'
                 }
               `}
             >
@@ -135,7 +135,7 @@ export default function PostNavigation({
                 return (
                   <span
                     key={`ellipsis-${index}`}
-                    className="px-2 text-stone-400 dark:text-stone-600"
+                    className="px-2 text-stone-400"
                   >
                     ...
                   </span>
@@ -152,8 +152,8 @@ export default function PostNavigation({
                     px-3 py-1 rounded-lg text-sm min-w-[2rem]
                     ${
                       currentPage === page
-                        ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-medium'
-                        : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+                        ? 'bg-stone-900 text-white font-medium'
+                        : 'text-stone-600 hover:bg-[var(--color-accent-subtle)]'
                     }
                   `}
                 >
@@ -171,8 +171,8 @@ export default function PostNavigation({
                 px-3 py-1 rounded-lg text-sm
                 ${
                   currentPage === totalPages
-                    ? 'text-stone-300 dark:text-stone-700 cursor-not-allowed'
-                    : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+                    ? 'text-stone-300 cursor-not-allowed'
+                    : 'text-stone-600 hover:bg-[var(--color-accent-subtle)]'
                 }
               `}
             >

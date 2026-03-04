@@ -45,18 +45,18 @@ export default async function AboutPage({ params }: PageProps) {
   const alternateLang = lang === 'en' ? 'ko' : 'en';
 
   return (
-    <div className="max-w-3xl mx-auto py-8 sm:py-12">
+    <div className="max-w-3xl mx-auto py-6 sm:py-10 min-w-0">
       {/* Header */}
       <header className="mb-10">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl sm:text-4xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-stone-900 tracking-tight">
             {pageData.title}
           </h1>
 
           {/* Language switcher */}
           <Link
             href={`/${alternateLang}/about`}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+            className="inline-flex items-center gap-1.5 self-start rounded-full border border-[color:var(--color-border)] px-3 py-1.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-[var(--color-accent-subtle)] transition-colors"
           >
             <svg
               className="w-4 h-4"
@@ -76,7 +76,7 @@ export default async function AboutPage({ params }: PageProps) {
         </div>
       </header>
 
-      <hr className="h-px bg-gradient-to-r from-stone-200 via-stone-200 to-transparent dark:from-stone-800 dark:via-stone-800 border-0 mb-10" />
+      <hr className="h-px bg-gradient-to-r from-amber-200 via-orange-200 to-transparent border-0 mb-10" />
 
       {/* Content */}
       <article className="mb-12">
@@ -84,10 +84,10 @@ export default async function AboutPage({ params }: PageProps) {
       </article>
 
       {/* Footer */}
-      <footer className="pt-8 border-t border-stone-200 dark:border-stone-800">
+      <footer className="pt-8 border-t border-[color:var(--color-border)]">
         <Link
           href={`/${lang}`}
-          className="inline-flex items-center gap-2 text-sm text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-200 transition-colors group/back cursor-pointer"
+          className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-stone-900 transition-colors group/back cursor-pointer"
         >
           <svg className="w-4 h-4 transition-transform group-hover/back:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           {t.home}

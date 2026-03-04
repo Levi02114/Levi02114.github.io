@@ -27,7 +27,7 @@ export default function LanguageToggle({
   return (
     <div
       className={`
-        flex rounded-lg bg-stone-100 dark:bg-stone-800 p-0.5
+        flex rounded-full border border-[color:var(--color-border)] bg-[rgba(255,248,238,0.92)] p-0.5 shadow-sm
         ${floating ? 'fixed top-4 right-4 z-50' : ''}
         ${className}
       `}
@@ -41,12 +41,12 @@ export default function LanguageToggle({
           aria-pressed={currentLang === lang}
           aria-label={`Switch to ${lang === 'en' ? 'English' : 'Korean'}`}
           className={`
-            px-3 py-1 rounded-md text-xs font-medium tracking-wide transition-all duration-150 cursor-pointer
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
+            px-3 py-1 rounded-full text-xs font-semibold tracking-[0.18em] transition-all duration-150 cursor-pointer
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-1
             ${
               currentLang === lang
-                ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm'
-                : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'
+                ? 'bg-white text-stone-900 shadow-sm'
+                : 'text-stone-500 hover:text-amber-800'
             }
           `}
         >

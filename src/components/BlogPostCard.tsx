@@ -11,11 +11,11 @@ interface BlogPostCardProps {
 
 export default function BlogPostCard({ post, lang }: BlogPostCardProps) {
   return (
-    <article className="group relative rounded-xl border border-stone-200/60 dark:border-stone-800/60 bg-white dark:bg-stone-900/50 p-5 transition-all duration-300 ease-out hover:border-stone-300 dark:hover:border-stone-700 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-0.5">
+    <article className="group relative rounded-[1.35rem] border border-[color:var(--color-border)] bg-[rgba(255,252,247,0.82)] p-5 transition-all duration-300 ease-out hover:border-amber-300 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-0.5">
       {/* Featured Image */}
       {post.frontmatter.image && (
         <Link href={`/${lang}/posts/${post.slug}`} className="block mb-4 cursor-pointer">
-          <div className="aspect-[16/10] overflow-hidden rounded-lg border border-stone-200 dark:border-stone-800">
+          <div className="aspect-[16/10] overflow-hidden rounded-xl border border-[color:var(--color-border)]">
             <img
               src={post.frontmatter.image}
               alt={post.frontmatter.title}
@@ -29,14 +29,14 @@ export default function BlogPostCard({ post, lang }: BlogPostCardProps) {
       <div className="flex items-center gap-2 mb-2.5">
         <Link
           href={buildCategoryHref(lang, post.frontmatter.category)}
-          className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer"
+          className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700 hover:text-amber-800 transition-colors cursor-pointer"
         >
           {post.frontmatter.category}
         </Link>
-        <span className="text-stone-300 dark:text-stone-700">·</span>
+        <span className="text-stone-300">·</span>
         <time
           dateTime={post.frontmatter.date}
-          className="text-xs text-stone-400 dark:text-stone-500 tabular-nums"
+          className="text-xs text-stone-500 tabular-nums"
         >
           {format(new Date(post.frontmatter.date), 'MMM d, yyyy')}
         </time>
@@ -44,13 +44,13 @@ export default function BlogPostCard({ post, lang }: BlogPostCardProps) {
 
       {/* Title */}
       <Link href={`/${lang}/posts/${post.slug}`} className="cursor-pointer">
-        <h3 className="text-[1.075rem] font-semibold text-stone-900 dark:text-stone-100 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 line-clamp-2 leading-snug tracking-tight">
+        <h3 className="text-[1.075rem] font-semibold text-stone-900 mb-2 group-hover:text-amber-800 transition-colors duration-200 line-clamp-2 leading-snug tracking-tight">
           {post.frontmatter.title}
         </h3>
       </Link>
 
       {/* Description */}
-      <p className="text-sm text-stone-500 dark:text-stone-400 mb-4 line-clamp-2 leading-relaxed">
+      <p className="text-sm text-stone-600 mb-4 line-clamp-2 leading-relaxed">
         {post.frontmatter.description}
       </p>
 
@@ -60,7 +60,7 @@ export default function BlogPostCard({ post, lang }: BlogPostCardProps) {
           {post.frontmatter.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="text-[11px] font-medium px-2 py-0.5 bg-stone-100 dark:bg-stone-800/80 text-stone-500 dark:text-stone-400 rounded-full"
+              className="text-[11px] font-medium px-2 py-0.5 bg-[var(--color-accent-subtle)] text-stone-600 rounded-full"
             >
               {tag}
             </span>

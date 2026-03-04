@@ -18,7 +18,7 @@ export default function BlogPostList({
   if (posts.length === 0) {
     return (
       <div className="text-center py-16">
-        <p className="text-stone-500 dark:text-stone-400">
+        <p className="text-stone-600">
           {emptyMessage ||
             (lang === 'en'
               ? 'No posts found. Check back soon!'
@@ -31,7 +31,7 @@ export default function BlogPostList({
   return (
     <section>
       {title && (
-        <h2 className="text-2xl font-bold mb-8 text-stone-900 dark:text-stone-100 tracking-tight">
+        <h2 className="text-2xl font-bold mb-8 text-stone-900 tracking-tight">
           {title}
         </h2>
       )}

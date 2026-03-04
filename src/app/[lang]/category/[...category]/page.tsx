@@ -94,11 +94,11 @@ export default async function CategoryPage({ params }: PageProps) {
     <div className="py-8 sm:py-12">
       {/* Breadcrumb */}
       <nav className="mb-6" aria-label="Breadcrumb">
-        <ol className="flex items-center gap-1.5 text-sm text-stone-400 dark:text-stone-500">
+        <ol className="flex flex-wrap items-center gap-1.5 text-sm text-stone-500">
           <li>
             <Link
               href={`/${lang}`}
-              className="hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+              className="hover:text-stone-700 transition-colors"
             >
               {t.home}
             </Link>
@@ -108,7 +108,7 @@ export default async function CategoryPage({ params }: PageProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </li>
-          <li className="text-stone-700 dark:text-stone-300 font-medium capitalize">
+          <li className="text-stone-700 font-medium capitalize">
             {categoryData.name}
           </li>
         </ol>
@@ -116,10 +116,10 @@ export default async function CategoryPage({ params }: PageProps) {
 
       {/* Header */}
       <header className="mb-10">
-        <h1 className="text-3xl font-bold mb-2 text-stone-900 dark:text-stone-100 tracking-tight capitalize">
+        <h1 className="text-3xl font-bold mb-2 text-stone-900 tracking-tight capitalize">
           {categoryData.name}
         </h1>
-        <p className="text-sm text-stone-500 dark:text-stone-400">
+        <p className="text-sm text-stone-600">
           {lang === 'ko'
             ? `${categoryData.postCount}개의 포스트`
             : `${categoryData.postCount} ${categoryData.postCount === 1 ? 'post' : 'posts'}`}
@@ -138,10 +138,10 @@ export default async function CategoryPage({ params }: PageProps) {
       />
 
       {/* Back to all posts */}
-      <div className="mt-12 pt-8 border-t border-stone-200 dark:border-stone-800">
+      <div className="mt-12 pt-8 border-t border-[color:var(--color-border)]">
         <Link
           href={`/${lang}`}
-          className="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-200 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-stone-600 hover:text-stone-900 transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
