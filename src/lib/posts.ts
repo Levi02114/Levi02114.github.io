@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { type Language, languages } from '@/lib/i18n';
 import { parseMarkdown, markdownToHtml } from '@/lib/markdown';
 import type { Post, PostWithHtml, Category, CategoryNode } from '@/types/post';
 
@@ -21,30 +20,28 @@ function stripPagePrefix(dirName: string): string {
 }
 
 /**
- * Extract slug and language from filename
- * Format: {slug}-{lang}.md
- * Example: my-post-en.md -> { slug: 'my-post', lang: 'en' }
+ * Extract slug from filename
+ * Format: {slug}.md
+ * Example: my-post.md -> { slug: 'my-post' }
  */
-function parseFilename(filename: string): { slug: string; lang: Language } | null {
-  const match = filename.match(/^(.+)-(en|ko)\.md$/);
-  if (!match) return null;
+function parseFilename(filename: string): { slug: string } | null {
+  if (!filename.endsWith('.md')) return null;
 
-  const [, slug, lang] = match;
-  return { slug, lang: lang as Language };
+  const slug = filename.replace(/\.md$/, '');
+  return { slug };
 }
 
 /**
  * Collect markdown files that represent blog posts.
  * Rules:
  * - Top-level [page]* directories are standalone pages and are ignored for posts
- * - Inside a category directory, [page]<slug> is a post directory containing {slug}-{lang}.md files
+ * - Inside a category directory, [page]<slug> is a post directory containing <slug>.md files
  * - Non-[page] directories represent nested categories
  */
 interface PostFileRef {
   filePath: string;
   category: string;
   slug: string;
-  lang: Language;
 }
 
 function collectPostFiles(dir: string, categoryPath = '', isRoot = true): PostFileRef[] {
@@ -79,7 +76,6 @@ function collectPostFiles(dir: string, categoryPath = '', isRoot = true): PostFi
                 filePath: path.join(fullPath, postFile.name),
                 category,
                 slug,
-                lang: parsed.lang,
               });
             }
           }
@@ -149,14 +145,14 @@ function getCategoryDirectories(): string[] {
 function readPostFile(
   filePath: string,
   category: string,
-  parsedFromPath?: { slug: string; lang: Language }
+  parsedFromPath?: { slug: string }
 ): Post | null {
   const filename = path.basename(filePath);
   const parsed = parsedFromPath || parseFilename(filename);
 
   if (!parsed) return null;
 
-  const { slug, lang } = parsed;
+  const { slug } = parsed;
   const fileContent = fs.readFileSync(filePath, 'utf-8');
   const { content, data } = parseMarkdown(fileContent);
 
@@ -168,7 +164,6 @@ function readPostFile(
 
   return {
     slug,
-    lang,
     content,
     frontmatter: {
       title: data.title,
@@ -185,15 +180,13 @@ function readPostFile(
 }
 
 /**
- * Get all posts for a specific language
- * @param lang - Language code (en or ko)
+ * Get all posts
  * @returns Array of posts sorted by date (newest first)
  */
-const allPostsCache = new Map<Language, Post[]>();
+let allPostsCache: Post[] | null = null;
 
-export function getAllPosts(lang: Language): Post[] {
-  const cached = allPostsCache.get(lang);
-  if (cached) return cached;
+export function getAllPosts(): Post[] {
+  if (allPostsCache) return allPostsCache;
 
   const files = getPostFiles();
   const posts: Post[] = [];
@@ -201,10 +194,9 @@ export function getAllPosts(lang: Language): Post[] {
   for (const file of files) {
     const post = readPostFile(file.filePath, file.category, {
       slug: file.slug,
-      lang: file.lang,
     });
 
-    if (post && post.lang === lang) {
+    if (post) {
       posts.push(post);
     }
   }
@@ -214,18 +206,17 @@ export function getAllPosts(lang: Language): Post[] {
     (a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime()
   );
 
-  allPostsCache.set(lang, posts);
+  allPostsCache = posts;
   return posts;
 }
 
 /**
- * Get a single post by slug and language
- * @param slug - Post slug (without language suffix)
- * @param lang - Language code
+ * Get a single post by slug
+ * @param slug - Post slug
  * @returns Post with HTML content or null if not found
  */
-export async function getPostBySlug(slug: string, lang: Language): Promise<PostWithHtml | null> {
-  const file = getPostFiles().find(f => f.slug === slug && f.lang === lang);
+export async function getPostBySlug(slug: string): Promise<PostWithHtml | null> {
+  const file = getPostFiles().find(f => f.slug === slug);
 
   if (!file) {
     return null;
@@ -233,7 +224,6 @@ export async function getPostBySlug(slug: string, lang: Language): Promise<PostW
 
   const post = readPostFile(file.filePath, file.category, {
     slug: file.slug,
-    lang: file.lang,
   });
 
   if (!post) {
@@ -247,12 +237,11 @@ export async function getPostBySlug(slug: string, lang: Language): Promise<PostW
 /**
  * Get all posts in a specific category
  * @param category - Category slug
- * @param lang - Language code
  * @returns Array of posts in the category (already sorted by date)
  */
-export function getPostsByCategory(category: string, lang: Language): Post[] {
+export function getPostsByCategory(category: string): Post[] {
   // Leverage the cached getAllPosts instead of re-reading files
-  return getAllPosts(lang).filter(post => post.frontmatter.category === category);
+  return getAllPosts().filter(post => post.frontmatter.category === category);
 }
 
 /**
@@ -291,9 +280,9 @@ export function getCategories(): Category[] {
   return categories;
 }
 
-function getAllCategoryPaths(lang: Language): Set<string> {
+function getAllCategoryPaths(): Set<string> {
   const paths = new Set<string>();
-  const posts = getAllPosts(lang);
+  const posts = getAllPosts();
   posts.forEach(post => paths.add(post.frontmatter.category));
   getCategoryDirectories().forEach(dir => paths.add(dir));
   return paths;
@@ -332,9 +321,9 @@ function buildCategoryTree(paths: Set<string>): CategoryNode[] {
   return Array.from(categoryMap.values()).filter(node => !node.slug.includes('/'));
 }
 
-function addPostCountsToTree(node: CategoryNode, lang: Language): void {
-  node.count = getPostsByCategory(node.slug, lang).length;
-  node.children.forEach(child => addPostCountsToTree(child, lang));
+function addPostCountsToTree(node: CategoryNode): void {
+  node.count = getPostsByCategory(node.slug).length;
+  node.children.forEach(child => addPostCountsToTree(child));
 }
 
 function sortCategoryTree(node: CategoryNode): void {
@@ -344,12 +333,12 @@ function sortCategoryTree(node: CategoryNode): void {
   }
 }
 
-export function getCategoryTree(lang: Language): CategoryNode[] {
-  const categoryPaths = getAllCategoryPaths(lang);
+export function getCategoryTree(): CategoryNode[] {
+  const categoryPaths = getAllCategoryPaths();
   const roots = buildCategoryTree(categoryPaths);
 
   roots.forEach(root => {
-    addPostCountsToTree(root, lang);
+    addPostCountsToTree(root);
     sortCategoryTree(root);
   });
 
@@ -359,25 +348,24 @@ export function getCategoryTree(lang: Language): CategoryNode[] {
 }
 
 /**
- * Get the pinned post for a language
+ * Get the pinned post
  * Returns the most recent pinned post, or the most recent post if none are pinned
- * @param lang - Language code
  * @returns Post with HTML content or null if no posts exist
  */
-export async function getPinnedPost(lang: Language): Promise<PostWithHtml | null> {
-  const allPosts = getAllPosts(lang);
+export async function getPinnedPost(): Promise<PostWithHtml | null> {
+  const allPosts = getAllPosts();
 
   // Find pinned posts
   const pinnedPosts = allPosts.filter(post => post.frontmatter.pinned === true);
 
   if (pinnedPosts.length > 0) {
     // Return most recent pinned post (already sorted by date)
-    return getPostBySlug(pinnedPosts[0].slug, lang);
+    return getPostBySlug(pinnedPosts[0].slug);
   }
 
   // Fallback to most recent post
   if (allPosts.length > 0) {
-    return getPostBySlug(allPosts[0].slug, lang);
+    return getPostBySlug(allPosts[0].slug);
   }
 
   return null;
@@ -385,12 +373,11 @@ export async function getPinnedPost(lang: Language): Promise<PostWithHtml | null
 
 /**
  * Get featured posts
- * @param lang - Language code
  * @param limit - Maximum number of posts to return
  * @returns Array of featured posts
  */
-export function getFeaturedPosts(lang: Language, limit?: number): Post[] {
-  const allPosts = getAllPosts(lang);
+export function getFeaturedPosts(limit?: number): Post[] {
+  const allPosts = getAllPosts();
   const featured = allPosts.filter(post => post.frontmatter.featured);
 
   return limit ? featured.slice(0, limit) : featured;
@@ -398,43 +385,29 @@ export function getFeaturedPosts(lang: Language, limit?: number): Post[] {
 
 /**
  * Get recent posts
- * @param lang - Language code
  * @param limit - Maximum number of posts to return
  * @returns Array of recent posts
  */
-export function getRecentPosts(lang: Language, limit: number = 10): Post[] {
-  const allPosts = getAllPosts(lang);
+export function getRecentPosts(limit: number = 10): Post[] {
+  const allPosts = getAllPosts();
   return allPosts.slice(0, limit);
 }
 
 /**
- * Check if a post exists in a specific language
+ * Check if a post exists
  * @param slug - Post slug
- * @param lang - Language code
  * @returns True if post exists
  */
-export function postExists(slug: string, lang: Language): boolean {
-  return getPostFiles().some(file => file.slug === slug && file.lang === lang);
-}
-
-/**
- * Get the alternate language version of a post
- * @param slug - Post slug
- * @param currentLang - Current language
- * @returns The other language if post exists, null otherwise
- */
-export function getAlternateLanguage(slug: string, currentLang: Language): Language | null {
-  const otherLang = currentLang === 'en' ? 'ko' : 'en';
-  return postExists(slug, otherLang) ? otherLang : null;
+export function postExists(slug: string): boolean {
+  return getPostFiles().some(file => file.slug === slug);
 }
 
 /**
  * Get intro/landing page content
- * @param lang - Language code
  * @returns HTML content for the intro section
  */
-export async function getIntroContent(lang: Language): Promise<string> {
-  const introPath = path.join(contentDirectory, `intro-${lang}.md`);
+export async function getIntroContent(): Promise<string> {
+  const introPath = path.join(contentDirectory, 'intro.md');
 
   try {
     const fileContent = fs.readFileSync(introPath, 'utf-8');
@@ -450,14 +423,12 @@ export async function getIntroContent(lang: Language): Promise<string> {
 /**
  * Get standalone page content from [page] directories
  * @param pageName - Name of the page (e.g., 'about')
- * @param lang - Language code
  * @returns HTML content and title, or null if not found
  */
 export async function getPageContent(
-  pageName: string,
-  lang: Language
+  pageName: string
 ): Promise<{ html: string; title: string } | null> {
-  const pagePath = path.join(contentDirectory, `[page]${pageName}`, `${pageName}-${lang}.md`);
+  const pagePath = path.join(contentDirectory, `[page]${pageName}`, `${pageName}.md`);
 
   try {
     const fileContent = fs.readFileSync(pagePath, 'utf-8');

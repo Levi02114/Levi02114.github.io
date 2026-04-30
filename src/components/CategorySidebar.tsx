@@ -2,12 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { type Language } from '@/lib/i18n';
 import { type CategoryNode } from '@/types/post';
 import { buildCategoryHref } from '@/lib/paths';
 
 interface CategorySidebarProps {
-  lang: Language;
   categories: CategoryNode[];
   currentCategory?: string;
   className?: string;
@@ -18,7 +16,6 @@ interface CategorySidebarProps {
 
 interface CategoryItemProps {
   node: CategoryNode;
-  lang: Language;
   currentCategory?: string;
   level: number;
   expandedCategories: Set<string>;
@@ -27,7 +24,6 @@ interface CategoryItemProps {
 
 function CategoryItem({
   node,
-  lang,
   currentCategory,
   level,
   expandedCategories,
@@ -64,7 +60,7 @@ function CategoryItem({
         {!hasChildren && <span className="w-4 h-4 flex-shrink-0" aria-hidden="true" />}
 
         <Link
-          href={buildCategoryHref(lang, node.slug)}
+          href={buildCategoryHref(node.slug)}
           className={`
             flex-1 text-[13px] leading-snug cursor-pointer
             ${
@@ -86,7 +82,6 @@ function CategoryItem({
             <CategoryItem
               key={child.slug}
               node={child}
-              lang={lang}
               currentCategory={currentCategory}
               level={level + 1}
               expandedCategories={expandedCategories}
@@ -100,7 +95,6 @@ function CategoryItem({
 }
 
 export default function CategorySidebar({
-  lang,
   categories,
   currentCategory,
   className = '',
@@ -145,7 +139,6 @@ export default function CategorySidebar({
           <CategoryItem
             key={category.slug}
             node={category}
-            lang={lang}
             currentCategory={currentCategory}
             level={0}
             expandedCategories={expandedCategories}

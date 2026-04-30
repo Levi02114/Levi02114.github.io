@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { getCategoryTree } from "@/lib/posts";
+import AppShell from "@/components/AppShell";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://levi02114.github.io"),
   title: "Levi02114 Notes",
-  description: "Personal blog with Korean and English posts",
+  description: "개인 블로그",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const categories = getCategoryTree();
+
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className="min-h-screen antialiased">
-        {children}
+        <AppShell categories={categories}>
+          {children}
+        </AppShell>
       </body>
     </html>
   );

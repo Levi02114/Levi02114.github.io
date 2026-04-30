@@ -1,20 +1,19 @@
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import type { Post } from '@/types/post';
-import type { Language } from '@/lib/i18n';
 import { buildCategoryHref } from '@/lib/paths';
 
 interface BlogPostCardProps {
   post: Post;
-  lang: Language;
 }
 
-export default function BlogPostCard({ post, lang }: BlogPostCardProps) {
+export default function BlogPostCard({ post }: BlogPostCardProps) {
   return (
     <article className="group relative rounded-[1.35rem] border border-[color:var(--color-border)] bg-[rgba(255,252,247,0.82)] p-5 transition-all duration-300 ease-out hover:border-amber-300 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-0.5">
       {/* Featured Image */}
       {post.frontmatter.image && (
-        <Link href={`/${lang}/posts/${post.slug}`} className="block mb-4 cursor-pointer">
+        <Link href={`/posts/${post.slug}`} className="block mb-4 cursor-pointer">
           <div className="aspect-[16/10] overflow-hidden rounded-xl border border-[color:var(--color-border)]">
             <img
               src={post.frontmatter.image}
@@ -28,7 +27,7 @@ export default function BlogPostCard({ post, lang }: BlogPostCardProps) {
       {/* Meta line */}
       <div className="flex items-center gap-2 mb-2.5">
         <Link
-          href={buildCategoryHref(lang, post.frontmatter.category)}
+          href={buildCategoryHref(post.frontmatter.category)}
           className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700 hover:text-amber-800 transition-colors cursor-pointer"
         >
           {post.frontmatter.category}
@@ -38,12 +37,12 @@ export default function BlogPostCard({ post, lang }: BlogPostCardProps) {
           dateTime={post.frontmatter.date}
           className="text-xs text-stone-500 tabular-nums"
         >
-          {format(new Date(post.frontmatter.date), 'MMM d, yyyy')}
+          {format(new Date(post.frontmatter.date), 'yyyy년 M월 d일', { locale: ko })}
         </time>
       </div>
 
       {/* Title */}
-      <Link href={`/${lang}/posts/${post.slug}`} className="cursor-pointer">
+      <Link href={`/posts/${post.slug}`} className="cursor-pointer">
         <h3 className="text-[1.075rem] font-semibold text-stone-900 mb-2 group-hover:text-amber-800 transition-colors duration-200 line-clamp-2 leading-snug tracking-tight">
           {post.frontmatter.title}
         </h3>

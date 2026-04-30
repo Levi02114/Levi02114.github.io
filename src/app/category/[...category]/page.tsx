@@ -2,14 +2,12 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getPostsByCategory, getCategories } from '@/lib/posts';
-import { type Language, getTranslations, languages } from '@/lib/i18n';
 import BlogPostList from '@/components/BlogPostList';
 
 const CATEGORY_PLACEHOLDER = '__placeholder__';
 
 interface PageProps {
   params: Promise<{
-    lang: string;
     category: string[];
   }>;
 }
@@ -18,29 +16,16 @@ export async function generateStaticParams() {
   const categories = getCategories();
 
   if (categories.length === 0) {
-    return languages.map((lang) => ({
-      lang,
-      category: [CATEGORY_PLACEHOLDER],
-    }));
+    return [{ category: [CATEGORY_PLACEHOLDER] }];
   }
 
-  const params: { lang: string; category: string[] }[] = [];
-
-  // Generate params for both languages and all categories
-  for (const lang of languages) {
-    for (const category of categories) {
-      params.push({
-        lang,
-        category: category.slug.split('/'),
-      });
-    }
-  }
-
-  return params;
+  return categories.map(category => ({
+    category: category.slug.split('/'),
+  }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { lang, category } = await params;
+  const { category } = await params;
   const categoryPath = category.map(decodeURIComponent).join('/');
 
   if (categoryPath === CATEGORY_PLACEHOLDER) {
@@ -59,27 +44,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const title = `${categoryData.name.charAt(0).toUpperCase() + categoryData.name.slice(1)} Posts`;
-  const description = lang === 'ko'
-    ? `${categoryData.name} 카테고리의 모든 포스트를 확인하세요`
-    : `Browse all posts in the ${categoryData.name} category`;
 
   return {
     title,
-    description,
+    description: `${categoryData.name} 카테고리의 모든 포스트를 확인하세요`,
   };
 }
 
 export default async function CategoryPage({ params }: PageProps) {
-  const { lang, category } = await params;
+  const { category } = await params;
   const categoryPath = category.map(decodeURIComponent).join('/');
 
   if (categoryPath === CATEGORY_PLACEHOLDER) {
     notFound();
   }
 
-  const t = getTranslations(lang as Language);
-
-  // Get all categories to verify this one exists
   const categories = getCategories();
   const categoryData = categories.find(c => c.slug === categoryPath);
 
@@ -87,8 +66,7 @@ export default async function CategoryPage({ params }: PageProps) {
     notFound();
   }
 
-  // Get posts in this category
-  const posts = getPostsByCategory(categoryPath, lang as Language);
+  const posts = getPostsByCategory(categoryPath);
 
   return (
     <div className="py-8 sm:py-12">
@@ -97,10 +75,10 @@ export default async function CategoryPage({ params }: PageProps) {
         <ol className="flex flex-wrap items-center gap-1.5 text-sm text-stone-500">
           <li>
             <Link
-              href={`/${lang}`}
+              href="/"
               className="hover:text-stone-700 transition-colors"
             >
-              {t.home}
+              홈
             </Link>
           </li>
           <li>
@@ -120,33 +98,26 @@ export default async function CategoryPage({ params }: PageProps) {
           {categoryData.name}
         </h1>
         <p className="text-sm text-stone-600">
-          {lang === 'ko'
-            ? `${categoryData.postCount}개의 포스트`
-            : `${categoryData.postCount} ${categoryData.postCount === 1 ? 'post' : 'posts'}`}
+          {categoryData.postCount}개의 포스트
         </p>
       </header>
 
       {/* Posts */}
       <BlogPostList
         posts={posts}
-        lang={lang as Language}
-        emptyMessage={
-          lang === 'ko'
-            ? '이 카테고리에 포스트가 없습니다.'
-            : 'No posts in this category yet.'
-        }
+        emptyMessage="이 카테고리에 포스트가 없습니다."
       />
 
       {/* Back to all posts */}
       <div className="mt-12 pt-8 border-t border-[color:var(--color-border)]">
         <Link
-          href={`/${lang}`}
+          href="/"
           className="inline-flex items-center gap-1.5 text-sm text-stone-600 hover:text-stone-900 transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          {t.backToAllPosts}
+          모든 포스트 보기
         </Link>
       </div>
     </div>

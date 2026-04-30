@@ -2,18 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import type { Language } from '@/lib/i18n';
 import type { CategoryNode } from '@/types/post';
-import LanguageToggle from '@/components/LanguageToggle';
 import CategorySidebar from '@/components/CategorySidebar';
 
 interface AppShellProps {
-  lang: Language;
   categories: CategoryNode[];
   children: React.ReactNode;
 }
 
-export default function AppShell({ lang, categories, children }: AppShellProps) {
+export default function AppShell({ categories, children }: AppShellProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -42,30 +39,29 @@ export default function AppShell({ lang, categories, children }: AppShellProps) 
             </button>
 
             <Link
-              href={`/${lang}`}
+              href="/"
               className="max-w-[12rem] truncate text-base sm:max-w-none sm:text-lg font-semibold tracking-[0.02em] text-stone-900 hover:text-amber-700 transition-colors"
             >
               <span className="font-mono text-amber-700 mr-1">&gt;</span>Levi02114&#39;s Notes
             </Link>
           </div>
 
-          {/* Right: nav links + language toggle */}
+          {/* Right: nav links */}
           <div className="flex items-center gap-2">
             <nav className="hidden md:flex items-center gap-1 mr-2">
               <Link
-                href={`/${lang}`}
+                href="/"
                 className="px-3 py-1.5 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-[var(--color-accent-subtle)] rounded-full transition-colors cursor-pointer"
               >
-                {lang === 'ko' ? '홈' : 'Home'}
+                홈
               </Link>
               <Link
-                href={`/${lang}/about`}
+                href="/about"
                 className="px-3 py-1.5 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-[var(--color-accent-subtle)] rounded-full transition-colors cursor-pointer"
               >
-                {lang === 'ko' ? '소개' : 'About'}
+                소개
               </Link>
             </nav>
-            <LanguageToggle currentLang={lang} floating={false} />
           </div>
         </div>
       </header>
@@ -73,7 +69,6 @@ export default function AppShell({ lang, categories, children }: AppShellProps) 
       {/* Body */}
       <div className="w-full flex flex-col md:flex-row md:items-stretch items-start min-h-[calc(100vh-3.5rem)]">
         <CategorySidebar
-          lang={lang}
           categories={categories}
           className="flex-shrink-0"
           mobileOpen={isMobileMenuOpen}

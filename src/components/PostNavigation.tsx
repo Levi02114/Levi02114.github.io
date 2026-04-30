@@ -2,11 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { type Language } from '@/lib/i18n';
 import { type Post } from '@/types/post';
 
 interface PostNavigationProps {
-  lang: Language;
   posts: Post[];
   currentSlug?: string;
   postsPerPage?: number;
@@ -14,7 +12,6 @@ interface PostNavigationProps {
 }
 
 export default function PostNavigation({
-  lang,
   posts,
   currentSlug,
   postsPerPage = 5,
@@ -88,7 +85,7 @@ export default function PostNavigation({
           {displayedPosts.map((post, index) => (
             <div key={post.slug} className="flex items-center">
               <Link
-                href={`/${lang}/posts/${post.slug}`}
+                href={`/posts/${post.slug}`}
                 className={`
                   hover:text-amber-700 transition-colors
                   truncate max-w-[200px]

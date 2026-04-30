@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import type { Metadata } from 'next';
-import { getAllPosts, getPostBySlug, getAlternateLanguage } from '@/lib/posts';
-import { type Language, getTranslations, languageNames, languages } from '@/lib/i18n';
+import { getAllPosts, getPostBySlug } from '@/lib/posts';
 import { buildCategoryHref } from '@/lib/paths';
 import MarkdownContent from '@/components/MarkdownContent';
 
@@ -11,39 +11,22 @@ const POST_PLACEHOLDER = '__placeholder__';
 
 interface PageProps {
   params: Promise<{
-    lang: string;
     slug: string;
   }>;
 }
 
 export async function generateStaticParams() {
-  const params: { lang: string; slug: string }[] = [];
+  const posts = getAllPosts();
 
-  // Generate params for both languages
-  for (const lang of languages) {
-    const posts = getAllPosts(lang);
-
-    if (posts.length === 0) {
-      params.push({
-        lang,
-        slug: POST_PLACEHOLDER,
-      });
-      continue;
-    }
-
-    for (const post of posts) {
-      params.push({
-        lang,
-        slug: post.slug,
-      });
-    }
+  if (posts.length === 0) {
+    return [{ slug: POST_PLACEHOLDER }];
   }
 
-  return params;
+  return posts.map(post => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { lang, slug } = await params;
+  const { slug } = await params;
 
   if (slug === POST_PLACEHOLDER) {
     return {
@@ -51,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const post = await getPostBySlug(slug, lang as Language);
+  const post = await getPostBySlug(slug);
 
   if (!post) {
     return {
@@ -75,21 +58,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function PostPage({ params }: PageProps) {
-  const { lang, slug } = await params;
-  const langTyped = lang as Language;
+  const { slug } = await params;
 
   if (slug === POST_PLACEHOLDER) {
     notFound();
   }
 
-  const post = await getPostBySlug(slug, langTyped);
+  const post = await getPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
-
-  const t = getTranslations(langTyped);
-  const alternateLang = getAlternateLanguage(slug, langTyped);
 
   return (
     <article className="max-w-3xl mx-auto py-6 sm:py-10 min-w-0">
@@ -98,7 +77,7 @@ export default async function PostPage({ params }: PageProps) {
         {/* Category */}
         <div className="mb-4">
           <Link
-            href={buildCategoryHref(langTyped, post.frontmatter.category)}
+            href={buildCategoryHref(post.frontmatter.category)}
             className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 hover:text-amber-800 transition-colors cursor-pointer"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
@@ -125,7 +104,7 @@ export default async function PostPage({ params }: PageProps) {
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            {format(new Date(post.frontmatter.date), 'MMMM d, yyyy')}
+            {format(new Date(post.frontmatter.date), 'yyyy년 M월 d일', { locale: ko })}
           </time>
 
           {/* Author */}
@@ -138,22 +117,6 @@ export default async function PostPage({ params }: PageProps) {
                 </svg>
                 {post.frontmatter.author}
               </span>
-            </>
-          )}
-
-          {/* Language switcher for alternate version */}
-          {alternateLang && (
-            <>
-              <span className="text-stone-300">·</span>
-              <Link
-                href={`/${alternateLang}/posts/${slug}`}
-                className="inline-flex items-center gap-1.5 text-amber-700 hover:text-amber-800 transition-colors"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                </svg>
-                {languageNames[alternateLang]}
-              </Link>
             </>
           )}
         </div>
@@ -192,25 +155,13 @@ export default async function PostPage({ params }: PageProps) {
 
       {/* Footer */}
       <footer className="mt-16 pt-8 border-t border-[color:var(--color-border)]">
-        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <Link
-            href={`/${lang}`}
-            className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-stone-900 transition-colors group/back cursor-pointer"
-          >
-            <svg className="w-4 h-4 transition-transform group-hover/back:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-            {t.home}
-          </Link>
-
-          {alternateLang && (
-            <Link
-              href={`/${alternateLang}/posts/${slug}`}
-              className="inline-flex items-center gap-2 text-sm text-amber-700 hover:text-amber-800 transition-colors group/lang cursor-pointer"
-            >
-              {lang === 'en' ? '한국어로 읽기' : 'Read in English'}
-              <svg className="w-4 h-4 transition-transform group-hover/lang:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-            </Link>
-          )}
-        </div>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-stone-900 transition-colors group/back cursor-pointer"
+        >
+          <svg className="w-4 h-4 transition-transform group-hover/back:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          홈
+        </Link>
       </footer>
     </article>
   );

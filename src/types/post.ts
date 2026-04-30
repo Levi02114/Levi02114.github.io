@@ -1,5 +1,3 @@
-import { type Language } from '@/lib/i18n';
-
 export interface PostFrontmatter {
   title: string;
   description: string;
@@ -14,7 +12,6 @@ export interface PostFrontmatter {
 
 export interface Post {
   slug: string;
-  lang: Language;
   frontmatter: PostFrontmatter;
   content: string;
 }
