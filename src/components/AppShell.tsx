@@ -42,7 +42,7 @@ export default function AppShell({ categories, children }: AppShellProps) {
               href="/"
               className="max-w-[12rem] truncate text-base sm:max-w-none sm:text-lg font-semibold tracking-[0.02em] text-stone-900 hover:text-amber-700 transition-colors"
             >
-              <span className="font-mono text-amber-700 mr-1">&gt;</span>Levi02114&#39;s Notes
+              <span className="font-mono text-amber-700 mr-1">&gt;</span>레비의 공간
             </Link>
           </div>
 
