@@ -94,14 +94,8 @@ function collectPostFiles(dir: string, categoryPath = '', isRoot = true): PostFi
   return files;
 }
 
-// Cache for post file references
-let postFileCache: PostFileRef[] | null = null;
-
 function getPostFiles(): PostFileRef[] {
-  if (!postFileCache) {
-    postFileCache = collectPostFiles(contentDirectory);
-  }
-  return postFileCache;
+  return collectPostFiles(contentDirectory);
 }
 
 /**
@@ -129,14 +123,8 @@ function collectCategoryDirectories(dir: string, categoryPath = ''): string[] {
   return categories;
 }
 
-// Cache for category directories
-let categoryDirCache: string[] | null = null;
-
 function getCategoryDirectories(): string[] {
-  if (!categoryDirCache) {
-    categoryDirCache = collectCategoryDirectories(contentDirectory);
-  }
-  return categoryDirCache;
+  return collectCategoryDirectories(contentDirectory);
 }
 
 /**
@@ -183,11 +171,7 @@ function readPostFile(
  * Get all posts
  * @returns Array of posts sorted by date (newest first)
  */
-let allPostsCache: Post[] | null = null;
-
 export function getAllPosts(): Post[] {
-  if (allPostsCache) return allPostsCache;
-
   const files = getPostFiles();
   const posts: Post[] = [];
 
@@ -206,7 +190,6 @@ export function getAllPosts(): Post[] {
     (a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime()
   );
 
-  allPostsCache = posts;
   return posts;
 }
 
