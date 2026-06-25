@@ -20,7 +20,7 @@ export async function generateStaticParams() {
   }
 
   return categories.map(category => ({
-    category: category.slug.split('/'),
+    category: category.slug.split('/').map(segment => encodeURIComponent(segment)),
   }));
 }
 
