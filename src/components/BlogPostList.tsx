@@ -31,8 +31,11 @@ export default function BlogPostList({
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-        {posts.map((post) => (
-          <BlogPostCard key={post.slug} post={post} />
+        {posts.map((post, index) => (
+          <BlogPostCard
+            key={`${post.frontmatter.category}/${post.slug}/${index}`}
+            post={post}
+          />
         ))}
       </div>
     </section>
